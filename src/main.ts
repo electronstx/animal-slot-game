@@ -8,8 +8,14 @@ async function init() {
     const container = document.getElementById('pixi-container');
     if (!container) return;
 
-    await app.init({ 
+    container.innerHTML = ''; 
+
+    await app.init({
+        width: 1200,
+        height: 900,
         background: '#1099bb', 
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
         resizeTo: container as HTMLElement
     });
     container.appendChild(app.canvas);
