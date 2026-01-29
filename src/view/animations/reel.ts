@@ -1,0 +1,113 @@
+import * as PIXI from 'pixi.js';
+import { ReelType } from './types';
+import Scene from '../scene';
+import { SLOT_KEYS } from '../../assets';
+import { Assets } from 'pixi.js';
+import { backout, tweenTo, updateTweens } from './tween';
+
+export default class Reel {
+    readonly #REEL_WIDTH = 160;
+    readonly #SYMBOL_SIZE = 160;
+    #scene?: Scene;
+    #reels: ReelType[] = [];
+    #textureKeys: string[] = [];
+    #running = false;
+
+    constructor(scene: Scene) {
+        this.#scene = scene;
+
+        this.#textureKeys = SLOT_KEYS; 
+    }
+
+    async create(): Promise<void> {
+        if (!this.#scene) return;
+
+        const reelContainer = new PIXI.Container();
+
+        for (let i = 0; i < 5; i++) {
+            const rc = new PIXI.Container();
+            rc.x = i * this.#REEL_WIDTH;
+            reelContainer.addChild(rc);
+
+            const reel: ReelType = {
+                container: rc,
+                symbols: [],
+                position: 0,
+                previousPosition: 0,
+                blur: new PIXI.BlurFilter(),
+            };
+            reel.blur.strengthX = 0;
+            reel.blur.strengthY = 0;
+            rc.filters = [reel.blur];
+
+            for (let j = 0; j < 4; j++) {
+                const symbol = this.#createSymbol(j);
+                reel.symbols.push(symbol);
+                rc.addChild(symbol);
+            }
+            this.#reels.push(reel);
+        }
+
+        const margin = (this.#scene.app.screen.height - this.#SYMBOL_SIZE * 3) / 2;
+        reelContainer.y = margin;
+        reelContainer.x = Math.round(this.#scene.app.screen.width - this.#REEL_WIDTH * 5);
+
+        this.#scene.addChild(reelContainer);
+
+        this.#scene.app.ticker.add(this.update, this);
+    }
+
+    #createSymbol(index: number): PIXI.Sprite {
+        const randomKey = this.#textureKeys[Math.floor(Math.random() * this.#textureKeys.length)];
+        const texture = Assets.get(randomKey);
+        const symbol = new PIXI.Sprite(texture);
+        
+        symbol.y = index * this.#SYMBOL_SIZE;
+        const scale = Math.min(this.#SYMBOL_SIZE / symbol.width, this.#SYMBOL_SIZE / symbol.height);
+        symbol.scale.set(scale);
+        symbol.x = Math.round((this.#SYMBOL_SIZE - symbol.width) / 2);
+        
+        return symbol;
+    }
+
+    update(): void {
+        updateTweens();
+
+        for (const r of this.#reels) {
+            r.blur.strengthY = (r.position - r.previousPosition) * 8;
+            r.previousPosition = r.position;
+
+            for (let j = 0; j < r.symbols.length; j++) {
+                const s = r.symbols[j];
+                const prevY = s.y;
+                
+                s.y = ((r.position + j) % r.symbols.length) * this.#SYMBOL_SIZE - this.#SYMBOL_SIZE;
+
+                if (s.y < 0 && prevY > this.#SYMBOL_SIZE) {
+                    const randomKey = this.#textureKeys[Math.floor(Math.random() * this.#textureKeys.length)];
+                    s.texture = Assets.get(randomKey);
+                }
+            }
+        }
+    }
+
+    spin(): void {
+        if (this.#running) return;
+        this.#running = true;
+    
+        this.#reels.forEach((r, i) => {
+            const extra = Math.floor(Math.random() * 3);
+            const target = r.position + 10 + i * 5 + extra;
+            const time = 2500 + i * 600;
+    
+            tweenTo(
+                r, 
+                'position', 
+                target, 
+                time, 
+                backout(0.5), 
+                i === this.#reels.length - 1 ? () => { this.#running = false; } : null
+            );
+        });
+    }
+}
