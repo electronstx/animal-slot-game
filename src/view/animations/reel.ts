@@ -39,7 +39,6 @@ export default class Reel {
             };
             reel.blur.strengthX = 0;
             reel.blur.strengthY = 0;
-            rc.filters = [reel.blur];
 
             for (let j = 0; j < 4; j++) {
                 const symbol = this.#createSymbol(j);
@@ -89,8 +88,13 @@ export default class Reel {
         updateTweens();
 
         for (const r of this.#reels) {
+            const speed = r.position - r.previousPosition;
             r.blur.strengthY = (r.position - r.previousPosition) * 8;
             r.previousPosition = r.position;
+
+            if (Math.abs(speed) < 0.001 && r.container.filters) {
+                r.container.filters = null;
+            }
 
             for (let j = 0; j < r.symbols.length; j++) {
                 const s = r.symbols[j];
@@ -114,6 +118,8 @@ export default class Reel {
             const extra = Math.floor(Math.random() * 3);
             const target = r.position + 10 + i * 5 + extra;
             const time = 2500 + i * 600;
+
+            r.container.filters = [r.blur];
     
             tweenTo(
                 r, 
