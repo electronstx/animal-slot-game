@@ -31,19 +31,27 @@
 
 Проект использует **pnpm**:
 
-```bash
 # Установка зависимостей
+```bash
 pnpm install
+```
 
 # Запуск среды разработки (Game Server)
+```bash
 pnpm dev
+```
 
 # Запуск Gulp Watcher для работы с ассетами
+```bash
 pnpm watch:assets
+```
 
 # Сборка ассетов и манифеста
+```bash
 pnpm build:assets
+```
 
-# Полная сборка проекта для продакшена
+# Полная сборка проекта
+```bash
 pnpm build
 ```
