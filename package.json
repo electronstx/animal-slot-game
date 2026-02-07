@@ -4,14 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:assets": "gulp build",
+    "watch:assets": "gulp dev",
     "start": "pnpm run dev",
-    "build": "pnpm run lint && tsc && vite build",
+    "build": "pnpm build:assets && pnpm run lint && tsc && vite build",
     "lint": "eslint .",
     "dev": "vite"
   },
   "dependencies": {
     "pixi.js": "^8.8.1",
-    "pnpm": "^10.28.2"
+    "pnpm": "^10.28.2",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -19,6 +22,8 @@
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-prettier": "^5.2.6",
+    "gulp": "^5.0.1",
+    "gulp-sharp": "^0.1.0",
     "prettier": "^3.5.3",
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.25.0",

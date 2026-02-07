@@ -1,0 +1,22 @@
+{
+  "bundles": [
+    {
+      "name": "reels",
+      "assets": [
+        {
+          "alias": "spritesheet",
+          "src": "reels/spritesheet.json"
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "assets": [
+        {
+          "alias": "background",
+          "src": "main/background.webp"
+        }
+      ]
+    }
+  ]
+}

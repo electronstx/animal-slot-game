@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { ReelType } from './types';
 import Scene from '../scene';
-import { SLOT_KEYS } from '../../assets';
 import { Assets } from 'pixi.js';
 import { backout, tweenTo, updateTweens } from './tween';
 import { REEL_WIDTH, SYMBOL_SIZE } from '../../constants';
@@ -16,12 +15,17 @@ export default class Reel {
 
     constructor(scene: Scene) {
         this.#scene = scene;
-
-        this.#textureKeys = SLOT_KEYS; 
     }
 
     async create(): Promise<void> {
         if (!this.#scene) return;
+
+        const bundleReels = await Assets.loadBundle('reels');
+        const sheet = bundleReels.spritesheet;
+
+        if (!sheet || !sheet.textures) return;
+            
+        this.#textureKeys = Object.keys(sheet.textures);
 
         this.#reelContainer = new PIXI.Container();
 
@@ -47,10 +51,6 @@ export default class Reel {
             }
             this.#reels.push(reel);
         }
-
-        const margin = (this.#scene.app.screen.height - SYMBOL_SIZE * 3) / 2;
-        this.#reelContainer.y = margin;
-        this.#reelContainer.x = Math.round(this.#scene.app.screen.width - REEL_WIDTH * 5);
 
         this.#scene.addChild(this.#reelContainer);
 

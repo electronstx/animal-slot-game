@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import Scene from './view/scene.js';
-import { getAssets } from './assets.js';
+import { initManifest } from './assets.js';
+import { Assets } from 'pixi.js';
 
 const app = new PIXI.Application();
 
@@ -20,7 +21,8 @@ async function init() {
     });
     container.appendChild(app.canvas);
 
-    await getAssets();
+    await initManifest(); 
+    await Assets.loadBundle('main');
 
     const scene = new Scene(app);
     app.stage.addChild(scene);
